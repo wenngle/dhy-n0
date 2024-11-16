@@ -1,0 +1,3 @@
+[submodule "eog-resources"]
+	path = eog-resources
+	url = https://github.com/nihaal419/HackUTD-RippleEffect
