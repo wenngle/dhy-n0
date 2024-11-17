@@ -52,6 +52,11 @@
   color: #888;
 } */
 
+button{
+  background-color: var(--darkHighlight);
+}
+
+
 .display{
   height: 90vh;
 }
@@ -60,15 +65,45 @@
   width: 100%;
   background-color: var(--darkHighlight);
 }
-
-#GraphHere{
-  width: 300px;
+#GraphDisplay{
+  height:60vh;
 }
-
+#graphDisplayContainer{
+  /* height:80vh; */
+}
+#graphDisplayContainer > div > div{
+  margin-bottom: 2vh;
+}
 .navbar{
   position: sticky;
   top:0;
 
+  z-index: 1000;
+
   
   background-color: var(--darkHighlight);
+}
+
+#displayAllGraphs{
+  display: block;
+}
+#displayOneGraph{
+  display: none;
+}
+#displayOneGraph>div>div{
+  display: none;
+}
+.wellNameTitle{
+  padding:3% 5%;
+}
+
+img{
+  display: block;
+  width: 50px;
+}
+
+
+.custom-tooltip{
+  /* background-color: var(--fleshYellow); */
+
 }
