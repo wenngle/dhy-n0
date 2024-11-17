@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import './App.css'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 function Head() {
   return (
@@ -35,9 +35,8 @@ function Body() {
           <br />
           <Query></Query>
         </div>
-        <div className="col-9">
-
-          <Graph apiEndpoint='/api/test_data'/>
+        <div id = "GraphDisplay" className="col-9">
+          <GraphWrapper></GraphWrapper>
 
           {/* <Yap></Yap> */}
         </div>
@@ -45,6 +44,45 @@ function Body() {
     </div>
   )
 
+}
+
+function GraphWrapper({type = 2}){
+  
+  
+  if(type == 2){
+    
+    return(
+      
+
+
+    <div className = "container">
+      <button onClick={()}>one at a time</button>
+      <button>all 9</button>
+
+      <button>in a line</button>
+      
+
+
+
+
+      <div className = "row">
+        <div className = "col-4"><Graph apiEndpoint='/api/test_data'/></div>
+        <div className = "col-4"><Graph apiEndpoint='/api/test_data'/></div>
+        <div className = "col-4"><Graph apiEndpoint='/api/test_data'/></div>
+      </div>
+      <div className = "row">
+        <div className = "col-4"><Graph apiEndpoint='/api/test_data'/></div>
+        <div className = "col-4"><Graph apiEndpoint='/api/test_data'/></div>
+        <div className = "col-4"><Graph apiEndpoint='/api/test_data'/></div>
+      </div>
+      <div className = "row">
+        <div className = "col-4"><Graph apiEndpoint='/api/test_data'/></div>
+        <div className = "col-4"><Graph apiEndpoint='/api/test_data'/></div>
+        <div className = "col-4"><Graph apiEndpoint='/api/test_data'/></div>
+      </div>
+    </div>
+    );
+  }
 }
 
 function Graph({apiEndpoint = '/api/test_data'}) {
@@ -59,21 +97,22 @@ function Graph({apiEndpoint = '/api/test_data'}) {
 
   return (
     <div id="GraphHere" className="bigContainer">
-
-      <LineChart width={800} height={300}
-        data={data}
-        margin={{
-          top: 5, right: 30, left: 20, bottom: 5,
-        }}
-      >
-        <CartesianGrid strokeOpacity={0.4}
-        />
-        <XAxis dataKey="Time" tickFormatter={(unixTime) => new Date(unixTime).toLocaleDateString()} />
-        <YAxis />
-        <Tooltip labelFormatter={(label) => new Date(label).toLocaleString()} />
-        <Legend />
-        <Line type="monotone" dataKey="Inj Gas Meter Volume Instantaneous" stroke="var(--skinGreen)" dot={false} />
-      </LineChart>
+      <ResponsiveContainer width = "100%" height = {200}>
+        <LineChart
+          data={data}
+          margin={{
+            top: 5, right: 30, left: 20, bottom: 5,
+          }}
+        >
+          <CartesianGrid strokeOpacity={0.4}
+          />
+          <XAxis dataKey="Time" tickFormatter={(unixTime) => new Date(unixTime).toLocaleDateString()} />
+          <YAxis />
+          <Tooltip labelFormatter={(label) => new Date(label).toLocaleString()} />
+          <Legend />
+          <Line type="monotone" dataKey="Inj Gas Meter Volume Instantaneous" stroke="var(--skinGreen)" dot={false} />
+        </LineChart>
+      </ResponsiveContainer>
 
     </div>
   )
@@ -82,11 +121,7 @@ function Graph({apiEndpoint = '/api/test_data'}) {
 function Query() {
   return (
     <div className="bigContainer">
-      <button></button>
-      <button></button>
-      <button></button>
-
-      <button></button>
+      
     </div>
   )
 }
