@@ -9,6 +9,10 @@
   /*On BG*/
     --dark: #050119;
     --darkHighlight: #1F3548;
+
+
+    --bgColor: var(--dark);
+    --bgAccent: var(--darkHighlight);
   }
 
   body{
@@ -88,9 +92,6 @@ button{
   display: block;
 }
 #displayOneGraph{
-  display: none;
-}
-#displayOneGraph>div>div{
   display: none;
 }
 .wellNameTitle{

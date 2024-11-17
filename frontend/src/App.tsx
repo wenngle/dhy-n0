@@ -2,6 +2,26 @@ import { useEffect, useState } from 'react'
 import './App.css'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
+const LightDark = () => {
+
+  return(
+    <input type="checkbox" defaultChecked data-toggle="toggle">
+      <button onClick={function(){}}>Light or Dark</button>
+    </input>
+    
+  );
+};
+
+
+{/* <button type = "button" className="nav-link active" aria-current="page" onClick={
+                function(){
+                  document.getElementById('displayAllGraphs').style.display = "block";
+                  document.getElementById('displayOneGraph').style.display = "none"; 
+                }
+              }>all 9</button> */}
+
+
+
 function Head() {
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary">
@@ -35,6 +55,7 @@ function Head() {
           </ul>
           
           <Upload></Upload>
+          {/* <LightDark></LightDark> */}
         </div>
       </div>
     </nav>
@@ -62,8 +83,6 @@ function Body() {
 }
 
 function GraphWrapper(){
-  // var displayAll= "<div className = 'row'><div className = 'col-4'><Graph apiEndpoint='/api/test_data'/></div> <div className = 'col-4'><Graph apiEndpoint='/api/test_data'/></div> <div className = 'col-4'><Graph apiEndpoint='/api/test_data'/></div  </div> <div className = 'row'>          <div className = 'col-4'><Graph apiEndpoint='/api/test_data'/></div>          <div className = 'col-4'><Graph apiEndpoint='/api/test_data'/></div>          <div className = 'col-4'><Graph apiEndpoint='/api/test_data'/></div> </div> <div className = 'row'> <div className = 'col-4'><Graph apiEndpoint='/api/test_data'/></div> <div className = 'col-4'><Graph apiEndpoint='/api/test_data'/></div> <div className = 'col-4'><Graph apiEndpoint='/api/test_data'/></div> </div> </div>"
-  
   function DisplayAll(){
     var h = 140;
     return (
@@ -71,40 +90,48 @@ function GraphWrapper(){
       <>
         <div className = "row">
           <div className = "col-4">
-            <Graph apiEndpoint='/api/well/0' Height={h} WellName="Well 1" />
+            <Graph n={0} Height={h} WellName="Well 1" />
           </div>
           <div className = "col-4">
-            <Graph apiEndpoint='/api/well/1' Height={h} WellName="Well 2"/></div>
+            <Graph n={1} Height={h} WellName="Well 2"/></div>
           <div className = "col-4">
-            <Graph apiEndpoint='/api/well/2' Height={h} WellName="Well 3"/></div>
+            <Graph n={2} Height={h} WellName="Well 3"/></div>
         </div>
         <div className = "row">
           <div className = "col-4">
-            <Graph apiEndpoint='/api/well/3' Height={h} WellName="Well 4"/></div>
+            <Graph n={3} Height={h} WellName="Well 4"/></div>
           <div className = "col-4">
-            <Graph apiEndpoint='/api/well/4' Height={h} WellName="Well 5"/></div>
+            <Graph n={4} Height={h} WellName="Well 5"/></div>
           <div className = "col-4">
-            <Graph apiEndpoint='/api/well/5' Height={h} WellName="Well 6"/></div>
+            <Graph n={5} Height={h} WellName="Well 6"/></div>
         </div>
         <div className = "row">
           <div className = "col-4">
-            <Graph apiEndpoint='/api/well/6' Height={h} WellName="Well 7"/></div>
+            <Graph n={6} Height={h} WellName="Well 7"/></div>
           <div className = "col-4">
-            <Graph apiEndpoint='/api/well/7' Height={h} WellName="Well 8"/></div>
+            <Graph n={7} Height={h} WellName="Well 8"/></div>
           <div className = "col-4">
-            <Graph apiEndpoint='/api/well/8' Height={h} WellName="Well 9"/></div>
+            <Graph n={8} Height={h} WellName="Well 9"/></div>
         </div>
       </>
     );
   }
-  function DisplayOne(){
+  function DisplayOne({o=0}){
+    function GetGraph({open=0}){
+      return (
+        <div className = "col-12s"><Graph n={open} WellName="Well 1"/></div>
+      );
+    }
     return (
-
       <>
-        <div className = "singleWells col-12s"><Graph apiEndpoint="/api/well/0" WellName="Well 1"/></div>
+        <GetGraph open={o} />
       </>
     );
   }
+
+  // const getAGraph = ({open=0}) => (
+  //   <div className = "col-12s"><Graph n={open} WellName="Well 1"/></div>
+  // );
   
   
   
@@ -116,6 +143,16 @@ function GraphWrapper(){
           <DisplayAll />
         </div>
         <div id = "displayOneGraph">
+          <div className="dropdown">
+            <button className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Dropdown button
+            </button>
+            <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <a className="dropdown-item" href="#">Action</a>
+              <a className="dropdown-item" href="#">Another action</a>
+              <a className="dropdown-item" href="#">Something else here</a>
+            </div>
+          </div>
           <DisplayOne />
         </div>
       </div>
@@ -131,7 +168,6 @@ const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     function getData(){
       const formattedDate = (dlabel) => new Date(dlabel).toLocaleString();
-      console.log(formattedDate(label)); 
 
       return(<labelFormatter />)
     }
@@ -149,11 +185,12 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-function Graph({apiEndpoint = '/api/test_data', Height=500, WellName = "TestWell"}) {
+function Graph({n=0, Height=500, WellName = "TestWell"}) {
+  var End = "/api/well/"+n;
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    fetch(apiEndpoint)
+    fetch(End)
       .then(response => response.json())
       .then(data => setData(data))
       .catch(error => console.error('Error:', error));
