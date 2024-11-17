@@ -9,4 +9,17 @@ export default defineConfig({
     },
   },
   plugins: [react()],
-})
+  resolve: {
+    alias: {
+      '@': '/src',
+    },
+  },
+  optimizeDeps: {
+    include: ['@popperjs/core'],
+  },
+  build: {
+    commonjsOptions: {
+      include: [/bootstrap/, /node_modules/],
+    },
+  },
+});

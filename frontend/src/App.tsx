@@ -1,262 +1,357 @@
-import { useEffect, useState } from 'react'
-import './App.css'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useEffect, useState } from "react";
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ReferenceLine,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import "./App.css";
 
-const LightDark = () => {
 
+function CreateAlert({wells=0, cllback = () =>{}}){
+  cllback(true);
+  alert("Holy-Guacamole!");
+  return <></>;
+}
+
+const Overveiw = () =>{
+  const [w, setWells] = useState([]);
+  const [alreadyShown, showAlready] = useState(false)
+  useEffect(() => {
+    fetch(`/api/wells`)
+      .then((response) => response.json())
+      .then(setWells)
+      .catch((error) => console.error("Error fetching well data:", error));
+  }, []);  
+
+ var numWells = 0;
+ var numGoodWells = 0;
+
+  const wells = w.map((well) => {
+    numWells += 1;
+    if(well.has_hydrate == false){numGoodWells+=1;}
+  });
+
+
+  if(numGoodWells == numWells){
+    return(
+      <div className="p-3">
+        <h5 className="border-bottom pb-2">Overview Status</h5>
+
+        <div className="mb-4">
+          <h6 className="text-muted mb-1">{numGoodWells}/{numWells} 
+          <span> &nbsp;&nbsp; &#10003;</span></h6>
+        </div>
+      </div>
+    );
+  }
   return(
-    <input type="checkbox" defaultChecked data-toggle="toggle">
-      <button onClick={function(){}}>Light or Dark</button>
-    </input>
-    
+    <div className="p-3">
+        <h5 className="border-bottom pb-2">Overview Status</h5>
+
+        <div className="mb-4">
+          <h6 className="text-muted mb-1">{numGoodWells}/{numWells}</h6>
+        </div>
+        { alreadyShown ? <></> :
+        <CreateAlert wells={(numWells-numGoodWells)} cllback={showAlready} />
+        }
+      </div>
+  );
+}
+
+const InfoPanel = ({ data }) => {  
+
+  if (!data) {
+    return (
+      <div className="h-100 d-flex align-items-top justify-content-center">
+        <p className="placedText">Hover over graph to see details</p>
+      </div>
+    );
+  }
+
+  const timestamp = new Date(data.label).toLocaleString();
+  const value = data.payload[0]?.value;
+
+  return (
+    <div className="p-3">
+      <h5 className="border-bottom pb-2">Point Details</h5>
+
+      <div className="mb-4">
+        <h6 className="text-muted mb-1">Timestamp</h6>
+        <p className="fs-6">{timestamp}</p>
+      </div>
+
+      <div className="mb-4">
+        <h6 className="text-muted mb-1">Gas Volume</h6>
+        <p className="fs-6">{value?.toFixed(2)}</p>
+      </div>
+    </div>
   );
 };
 
+function Navigation({ onViewChange }) {
+  const [uploading, setUploading] = useState(false);
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
 
-{/* <button type = "button" className="nav-link active" aria-current="page" onClick={
-                function(){
-                  document.getElementById('displayAllGraphs').style.display = "block";
-                  document.getElementById('displayOneGraph').style.display = "none"; 
-                }
-              }>all 9</button> */}
+    try {
+      setUploading(true);
+      const formData = new FormData();
+      formData.append('file', file);
 
+      const response = await fetch('/api/upload', { method: 'POST', body: formData});
 
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Upload failed');
+      }
 
-function Head() {
+      const result = await response.json();
+      alert('File uploaded successfully: ' + result.filename);
+
+    } catch (error) {
+      alert('Upload failed: ' + error.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
-    <nav className="navbar navbar-expand-lg bg-body-tertiary">
+    <nav className="navbar navbar-expand-lg bg-light">
       <div className="container-fluid">
-        
-      <img src = {"./dino1-01.png"}/>
-        <a className="navbar-brand" href="#">DHy-No</a>
-        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span className="navbar-toggler-icon"></span>
-        </button>
-        <div className="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-          <li className="nav-item">
-              <button type = "button" className="nav-link active" aria-current="page" onClick={
-                function(){
-                  document.getElementById('displayAllGraphs').style.display = "block";
-                  document.getElementById('displayOneGraph').style.display = "none"; 
-                }
-              }>all 9</button>
-            </li>
-            <li className="nav-item">
-              <button type = "button" className="nav-link active" aria-current="page" onClick={
-                function(){
-                  document.getElementById('displayAllGraphs').style.display = "none";
-                  document.getElementById('displayOneGraph').style.display = "block"; 
-                }
-              }
-              > one at a time</button>
-            </li>
-
-          </ul>
-          
-          <Upload></Upload>
-          {/* <LightDark></LightDark> */}
+        <div className="d-flex align-items-center">
+          <img
+            src={"./dino1-01.png"}
+            className="me-2"
+            style={{
+              height: "40px",
+              width: "auto",
+              objectFit: "contain",
+            }}
+          />
+          <a className="navbar-brand fw-bold" href="#">
+            DHy-No
+          </a>
+        </div>
+        <div className="d-flex align-items-center" id="navbarSupportedContent">
+          <button
+            className="btn btn-link text-decoration-none"
+            onClick={() => onViewChange("grid")}
+          >
+            All Wells
+          </button>
+          <button
+            className="btn btn-link text-decoration-none"
+            onClick={() => onViewChange("single")}
+          >
+            Single Well
+          </button>
+        </div>
+        <div className="d-flex align-items-center">
+          <div className="input-group">
+            <label className="input-group-text" htmlFor="inputGroupFile">
+              { uploading? 'Uploading...' : 'Upload CSV' }
+            </label>
+            <input
+              type="file"
+              className="form-control"
+              id="inputGroupFile"
+              accept=".csv"
+              onChange={handleFileUpload}
+              disabled={uploading}
+            />
+          </div>
         </div>
       </div>
     </nav>
-  )
+  );
 }
 
-function Body() {
-  return (
-    <div className="display container">
-      <div className="row">
-        <div id = "toolTip" className="col-2">
-          {/* <Upload></Upload>
-          <br />
-          <Query></Query> */}
-        </div>
-        <div id = "GraphDisplay" className="col-10">
-          <GraphWrapper></GraphWrapper>
+const WellGrid = ({ onDataPoint }) => {
+  const [data, setData] = useState([]);
+  useEffect(() => {
+    fetch(`/api/wells`)
+      .then((response) => response.json())
+      .then(setData)
+      .catch((error) => console.error("Error fetching well data:", error));
+  }, []);
 
-          {/* <Yap></Yap> */}
+  const wells = data.map((well) => {return {
+    id: well.id,
+    name: well.well_name,
+ };});
+
+  return (
+    <div className="row g-4">
+      {wells.map(well => (
+        <div key={well.id} className="col-12 col-md-6 col-lg-4">
+          <WellGraph
+            wellId={well.id}
+            height={140}
+            wellName={well.name}
+            onDataPoint={onDataPoint}
+          />
         </div>
-      </div>
+      ))}
     </div>
   )
+};
+const SingleWellView = ({ onDataPoint }) => {
+  const [selectedWell, setSelectedWell] = useState(0);
+  const [data, setData] = useState([]);
+  useEffect(() => {
+    fetch(`/api/wells`)
+      .then((response) => response.json())
+      .then(setData)
+      .catch((error) => console.error("Error fetching well data:", error));
+  }, []);
 
-}
+  const wells = data.map((well) => {return {
+    id: well.id,
+    name: well.well_name,
+ };});
 
-function GraphWrapper(){
-  function DisplayAll(){
-    var h = 140;
-    return (
-
-      <>
-        <div className = "row">
-          <div className = "col-4">
-            <Graph n={0} Height={h} WellName="Well 1" />
-          </div>
-          <div className = "col-4">
-            <Graph n={1} Height={h} WellName="Well 2"/></div>
-          <div className = "col-4">
-            <Graph n={2} Height={h} WellName="Well 3"/></div>
-        </div>
-        <div className = "row">
-          <div className = "col-4">
-            <Graph n={3} Height={h} WellName="Well 4"/></div>
-          <div className = "col-4">
-            <Graph n={4} Height={h} WellName="Well 5"/></div>
-          <div className = "col-4">
-            <Graph n={5} Height={h} WellName="Well 6"/></div>
-        </div>
-        <div className = "row">
-          <div className = "col-4">
-            <Graph n={6} Height={h} WellName="Well 7"/></div>
-          <div className = "col-4">
-            <Graph n={7} Height={h} WellName="Well 8"/></div>
-          <div className = "col-4">
-            <Graph n={8} Height={h} WellName="Well 9"/></div>
-        </div>
-      </>
-    );
-  }
-  function DisplayOne({o=0}){
-    function GetGraph({open=0}){
-      return (
-        <div className = "col-12s"><Graph n={open} WellName="Well 1"/></div>
-      );
-    }
-    return (
-      <>
-        <GetGraph open={o} />
-      </>
-    );
-  }
-
-  // const getAGraph = ({open=0}) => (
-  //   <div className = "col-12s"><Graph n={open} WellName="Well 1"/></div>
-  // );
-  
-  
-  
-  return(
-      <div id = "graphDisplayContainer">
-        
-      <br />
-        <div id = "displayAllGraphs">
-          <DisplayAll />
-        </div>
-        <div id = "displayOneGraph">
-          <div className="dropdown">
-            <button className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Dropdown button
+  return (
+    <div>
+      <div className="mb-4">
+        <div className="dropdown">
+          <button
+            className="btn btn-outline-secondary dropdown-toggle"
+            type="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+            >
+              Select Well
             </button>
-            <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <a className="dropdown-item" href="#">Action</a>
-              <a className="dropdown-item" href="#">Another action</a>
-              <a className="dropdown-item" href="#">Something else here</a>
-            </div>
-          </div>
-          <DisplayOne />
+          <ul className="dropdown-menu">
+            {wells.map(well => (
+              <li key={well.id}>
+                <button className="dropdown-item"
+                onClick={() =>setSelectedWell(well.id)}
+                >{well.name}</button>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
-    );
-
+      <WellGraph
+        wellId={selectedWell}
+        height={500}
+        wellName={wells.find(well => well.id == selectedWell).name}
+        onDataPoint={onDataPoint}
+      />
+    </div>
+  )
 }
 
-const labelFormatter = ({ label }) => {
-  return (label) => new Date(label).toLocaleString();
-}
-
-const CustomTooltip = ({ active, payload, label }) => {
-  if (active && payload && payload.length) {
-    function getData(){
-      const formattedDate = (dlabel) => new Date(dlabel).toLocaleString();
-
-      return(<labelFormatter />)
-    }
-        
-    document.getElementById('toolTip').innerHTML = getData();
-    return ( <></>
-      // <div className="custom-tooltip">
-      //   <p className="label">{`${(label) => new Date(label).toLocaleString()} : ${payload[0].value}`}</p>
-      //   <p className="intro">{"hi"}</p>
-      //   <p className="desc">Anything you want can be displayed here.</p>
-      // </div>
-    );
-  }
-  document.getElementById('toolTip').innerHTML = "no";
-  return null;
-};
-
-function Graph({n=0, Height=500, WellName = "TestWell"}) {
-  var End = "/api/well/"+n;
+function WellGraph({ wellId = 0, height = 500, wellName = "Test Well", onDataPoint }) {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    fetch(End)
-      .then(response => response.json())
-      .then(data => setData(data))
-      .catch(error => console.error('Error:', error));
-  }, []);
+    fetch(`/api/well/${wellId}`)
+      .then((response) => response.json())
+      .then(setData)
+      .catch((error) => console.error("Error fetching well data:", error));
+  }, [wellId]);
+
+  const handleMouseMove = (props) => {
+    if (props.activePayload) {
+      onDataPoint({
+        label: props.activeLabel,
+        payload: props.activePayload
+      })
+    }
+  };
+
+  const handleMouseLeave = () => {
+    onDataPoint(null);
+  };
 
   return (
-    <div id="GraphHere" className="bigContainer">
-      <div className="wellNameTitle">{WellName}</div>
-      <ResponsiveContainer width = "100%" height = {Height}>
-        <LineChart
-          data={data}
-          margin={{
-            top: 5, right: 30, left: 20, bottom: 5,
-          }}
-        >
-          <CartesianGrid strokeOpacity={0.4}
-          />
-          <XAxis dataKey="Time" tickFormatter={(unixTime) => new Date(unixTime).toLocaleDateString()} />
-          <YAxis />
-          {/* <Tooltip labelFormatter={(label) => new Date(label).toLocaleString()} /> */}
-          <Tooltip labelFormatter={(label) => new Date(label).toLocaleString()} content={<CustomTooltip />} />
-          
-           <defs>
-            <linearGradient id="myGradient" gradientTransform="rotate(90)">
-              <stop offset="20%" stopColor="#6F8155" />
-              <stop offset="80%" stopColor="#AC543B" />
-            </linearGradient>
-          </defs>
-          <Line type="monotone" dataKey={"Inj Gas Meter Volume Instantaneous"} stroke={"url(#myGradient)"} dot={false} />
-        </LineChart>
-      </ResponsiveContainer>
+    <div id="GraphHere" className="card h-100">
+      <div className="card-header">
+        <h5 className="card-title mb-0">{wellName}</h5>
+      </div>
+      <div className="card-body">
+        <ResponsiveContainer width="100%" height={height}>
+          <LineChart
+            data={data}
+            margin={{
+              top: 5,
+              right: 30,
+              left: 20,
+              bottom: 5,
+            }}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+          >
+            <CartesianGrid strokeOpacity={0.4} />
+            <XAxis
+              dataKey="Time"
+              tickFormatter={(unixTime) =>
+                new Date(unixTime).toLocaleDateString()
+              }
+            />
+            <YAxis />
+            <Tooltip content = {<></>}/>
 
+            <defs>
+              <linearGradient id="wellGradient" gradientTransform="rotate(90)">
+                <stop offset="20%" stopColor="#6F8155" />
+                <stop offset="80%" stopColor="#AC543B" />
+              </linearGradient>
+            </defs>
+            <Line
+              type="monotone"
+              dataKey={"Inj Gas Meter Volume Instantaneous"}
+              stroke={"url(#wellGradient)"}
+              dot={false}
+            />
+            {data.map((point, index) => (
+              point.Hydrate && (
+                <ReferenceLine
+                key = {index}
+                x = {point.Time}
+                stroke="#AC543B"
+                strokeOpacity={0.5}/>
+              )
+            ))}
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
     </div>
-  )
-}
-
-function Upload() {
-  return (
-    <div className="rightNav">
-      <label htmlFor="avatar">Upload New</label>
-      <input type="file" id="avatar" name="avatar" accept="csv" />
-
-    </div>
-  )
+  );
 }
 
 function App() {
-  const [count, setCount] = useState(0)
-  const [message, setMessage] = useState('')
-
-  useEffect(() => {
-    fetch('/api/hello')
-      .then(response => response.json())
-      .then(data => setMessage(data.message))
-      .catch(error => console.error('Error:', error));
-  }, []);
-
+  const [view, setView] = useState("grid");
+  const [hoverData, setHoverData] = useState(null);
   return (
-    <>
-    <Head></Head>
-      <Body></Body>
-
-
-      {/* <Head></Head> */}
-    </>
-  )
+    <div className="min-vh-100 bg-light">
+      <Navigation onViewChange={setView} />
+      <div className="container-fluid">
+        
+        <div className="row">
+          <div className="col-md-3 col-lg-2 border-start bg-white shadow-sm p-0">
+            <Overveiw />
+            <InfoPanel data={hoverData} />
+          </div>
+          <div className="col-md-9 col-lg-10 p-4">
+            {view == "grid" ? (
+              <WellGrid onDataPoint={setHoverData} />
+            ) : (
+              <SingleWellView onDataPoint={setHoverData} />
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
-export default App
+export default App;

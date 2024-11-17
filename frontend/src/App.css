@@ -17,7 +17,7 @@
 
   body{
     background-color: var(--dark);
-    color: var(--fleshGreen);
+    color: var(--skinGreen);
   }
 
 /* .logo {
@@ -98,11 +98,17 @@ button{
   padding:3% 5%;
 }
 
-img{
+/* img{
   display: block;
   width: 50px;
-}
+} */
 
+.placedText{
+  margin-top: 30%;
+  font-style: italic;
+  text-align: center;
+
+}
 
 .custom-tooltip{
   /* background-color: var(--fleshYellow); */
