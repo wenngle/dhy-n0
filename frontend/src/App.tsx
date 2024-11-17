@@ -215,6 +215,7 @@ const SingleWellView = ({ onDataPoint }) => {
     id: well.id,
     name: well.well_name,
  };});
+ const selectedWellData = wells.find(well => well.id == selectedWell);
 
   return (
     <div>
@@ -239,12 +240,16 @@ const SingleWellView = ({ onDataPoint }) => {
           </ul>
         </div>
       </div>
-      <WellGraph
+      {
+        selectedWellData != undefined ?
+        <WellGraph
         wellId={selectedWell}
         height={500}
-        wellName={wells.find(well => well.id == selectedWell).name}
+        wellName={selectedWellData.name}
         onDataPoint={onDataPoint}
-      />
+      /> : <></>
+      }
+      
     </div>
   )
 }
