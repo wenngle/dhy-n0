@@ -1,0 +1,63 @@
+#pictures
+{
+    width: 50%; 
+	margin-left: auto; 
+    margin-right: auto; 
+	margin-top: 20px; 
+	border-radius: 20px;
+}
+img{
+	
+	width: 20%; 
+}
+
+#caleb
+{
+    text-align: center; 
+	width: 20%; 
+	background-color: black;
+	display: inline-block;
+	float: left;
+	margin-right:10px;
+	margin-left: 55px;
+}
+
+#abhi
+{
+    text-align: center; 
+	width: 20%; 
+	background-color: black;
+	display: inline-block;
+	float: left;
+	margin-right:10px;
+	margin-left: 10px;
+}
+
+#zeke
+{
+    text-align: center; 
+	width: 20%; 
+	background-color: black;
+	display: inline-block;
+	float: left;
+	margin-right:10px;
+	margin-left: 10px;
+}
+
+#lilian
+{
+    text-align: center; 
+	width: 20%; 
+	background-color: black;
+	display: inline-block;
+	float: left;
+	margin-right:10px;
+	margin-left: 10px;
+}
+
+#h{
+	text-align: center;
+}
+#hh{
+	text-align: center;
+}
