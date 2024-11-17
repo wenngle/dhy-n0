@@ -23,12 +23,11 @@ def test_data(path):
 def chance_of_hydrite(df):
     return
 
-def uptick(df):
+def get_tick(df):
+    ''' 
+    Use for green up arrow and red down arrow in frontend to
+    show user if 
+    '''
     shape = df.shape
-    rows = shape[0]
-    df.loc(rows - 1)[""]
-
-    return
-
-def downtick(df):
-    pass
+    delta = df.loc[shape[0] - 1]["Inj Gas Meter Volume Instantaneous"] - df.loc[shape[0] - 2]["Inj Gas Meter Volume Instantaneous"]
+    return delta
