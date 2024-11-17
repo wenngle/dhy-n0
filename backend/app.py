@@ -21,7 +21,8 @@ def test_data(path):
     return df.ffill().to_json(orient='records')
 
 def chance_of_hydrite(df):
-    return
+    new_df = df[(df["Inj Gas Meter Volume Instantaneous"] <= 1) & (df["Inj Gas Valve Percent Open"] >= 90)]
+    return new_df
 
 def get_tick(df):
     ''' 
